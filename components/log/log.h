@@ -7,43 +7,40 @@ extern "C" {
 
 
 #include <stdarg.h>
-#include "bsp_usart.h"
+#include <string.h>
 #include "sys.h"
 #include "cmsis_os.h"
 
 int log_printf_to_buffer(char *buff, int size, char *fmt, ...);
 int initialize_log(void);
+void log_send(uint8_t *data, uint16_t len);
+void log_save_to_file(const char* file_name);
         
-#define LOG_OUTPUT_MAX_LEN  256
+#define LOG_OUTPUT_MAX_LEN  512
 extern char* log_str;
 
-// 日志，用于调试
-#define verbose_log(...) \
+
+// 日志
+#define log_printf(...) \
 do \
 { \
+    osThreadId_t thread_id = osThreadGetId(); \
     if(log_str != NULL) \
     { \
         int len = 0; \
-        len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "\r\n[Time]: %d.%03ds\r\n[File]: %s:%d\r\n[Func]: %s()\r\n>> ", (int)get_time_ms() / 1000, (int)get_time_ms() % 1000, __FILE__, __LINE__, __FUNCTION__); \
+        if (thread_id != NULL) { \
+            len += log_printf_to_buffer(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "%s,", osThreadGetName(thread_id)); \
+        } else { \
+            len += log_printf_to_buffer(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "None,"); \
+        } \
+        len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "%d.%03ds,%s:%d,%s,\"", (int)get_time_ms() / 1000, (int)get_time_ms() % 1000, __FILE__, __LINE__, __FUNCTION__); \
         len += log_printf_to_buffer(&log_str[len], LOG_OUTPUT_MAX_LEN - len, __VA_ARGS__); \
-        len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "\r\nstm32>> "); \
-        usart1_transmit((uint8_t *)log_str, len); \
+        len += log_printf_to_buffer(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "\"\r\n"); \
+        log_send((uint8_t *)log_str, len); \
     } \
 }while(0)
 
-#define short_log(...) \
-do \
-{ \
-    if(log_str != NULL) \
-    { \
-        int len = 0; \
-        len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "\r\n[%d.%03d] ", (int)get_time_ms() / 1000, (int)get_time_ms() % 1000); \
-        len += log_printf_to_buffer(&log_str[len], LOG_OUTPUT_MAX_LEN - len, __VA_ARGS__); \
-        usart1_transmit((uint8_t *)log_str, len); \
-    } \
-}while(0)
-
-// 内核日志，用于在操作系统启动前调试
+// 内核日志，直接输出到串口
 #define kernel_log(...) \
 do \
 { \

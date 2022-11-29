@@ -43,6 +43,7 @@
 #include "fatfs.h"
 #include "w25qxx.h"
 #include "ee24.h"
+#include "log.h"
 
 
 #ifdef _WINDOWS_
@@ -110,6 +111,7 @@ static BaseType_t prvMKDIRCommand( char *pcWriteBuffer, size_t xWriteBufferLen, 
 
 static BaseType_t prvWriteFileToFlashCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t prvWriteFileToEEPROMCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
+static BaseType_t prvWriteLogToFileCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 
 /* Structure that defines the DIR command line command, which lists all the
 files in the current directory. */
@@ -191,6 +193,14 @@ static const CLI_Command_Definition_t xWriteFileToEEPROM =
 	2 /* No parameters are expected. */
 };
 
+static const CLI_Command_Definition_t xWriteLogToFile =
+{
+	"write-log-to-file", /* The command string to type. */
+	"\r\nwrite-log-to-file <filename>:\r\n Write the log from flash to file.\r\n",
+	prvWriteLogToFileCommand, /* The function to run. */
+	1 /* No parameters are expected. */
+};
+
 //static const CLI_Command_Definition_t xMOUNT =
 //{
 //	"mount", /* The command string to type. */
@@ -213,6 +223,7 @@ void vRegisterFileSystemCLICommands( void )
     FreeRTOS_CLIRegisterCommand( &xMKDIR );
     FreeRTOS_CLIRegisterCommand( &xWriteFileToFlash );
     FreeRTOS_CLIRegisterCommand( &xWriteFileToEEPROM );
+    FreeRTOS_CLIRegisterCommand( &xWriteLogToFile );
     // FreeRTOS_CLIRegisterCommand( &xMOUNT );
 
 }
@@ -891,3 +902,23 @@ BaseType_t xParameterStringLength;
     return pdFALSE;
 }
 
+static BaseType_t prvWriteLogToFileCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+    const char *filename;
+    BaseType_t xParameterStringLength;
+    configASSERT( pcWriteBuffer );
+    
+	/* Obtain the parameter string. */
+    filename = FreeRTOS_CLIGetParameter
+					(
+						pcCommandString,		/* The command string itself. */
+						1,						/* Return the first parameter. */
+						&xParameterStringLength	/* Store the parameter string length. */
+					);
+
+    log_save_to_file(filename);
+    
+    sprintf(pcWriteBuffer, "Finished.\r\n");
+
+    return pdFALSE;
+}

@@ -33,7 +33,7 @@ void __register_cmd_callback(uint16_t cmd_id, protocol_cmd_callback_t callback, 
     ProtocolCallbackListNode* node = (ProtocolCallbackListNode*)pvPortMalloc(sizeof(ProtocolCallbackListNode));
     if(node == NULL)
     {
-        short_log("Protocol callback registered failure, cmd_id: 0x%04x, callback: %s().", cmd_id, callback_name);
+        log_printf("Protocol callback registered failure, cmd_id: 0x%04x, callback: %s().", cmd_id, callback_name);
     }
     node->life = life;
     node->parameter = parameter;
@@ -44,10 +44,10 @@ void __register_cmd_callback(uint16_t cmd_id, protocol_cmd_callback_t callback, 
     list_add_tail(&node->list, &protocol_callback_list);
     exit_critical();
     
-//    if(life < 0)
-//        short_log("Protocol callback is registered, cmd_id: 0x%04x, callback: %s().", cmd_id, callback_name);
-//    else
-//        short_log("Protocol callback is registered, cmd_id: 0x%04x, callback: %s(), life: %d.", cmd_id, callback_name, life);
+    if(life < 0)
+        log_printf("Protocol callback is registered, cmd_id: 0x%04x, callback: %s().", cmd_id, callback_name);
+    else
+        log_printf("Protocol callback is registered, cmd_id: 0x%04x, callback: %s(), life: %d.", cmd_id, callback_name, life);
 }
 
 // É¾³ý»Øµ÷º¯Êý
@@ -184,10 +184,12 @@ int32_t heart_timer(void *argc)
 int communicate_offline_id = -1;
 void communicate_offline_callback(void)
 {
+    log_printf("SDK Offline.");
     led_red_on();
 }
 void communicate_online_callback(void)
 {
+    log_printf("SDK Online.");
     led_red_off();
 }
 PROTOCOL_CALLBACK_FUNCTION(cmd_heart_callback)
@@ -213,7 +215,7 @@ void communicate_task(void *argument)
     register_cmd_callback(CMD_HEART, cmd_heart_callback, -1, NULL);
     while(1)
     {
-        communicate_offline_id = register_offline_callback(communicate_online_callback, communicate_offline_callback, 1000);
+        communicate_offline_id = register_offline_callback(NULL, communicate_online_callback, NULL, communicate_offline_callback, 1000);
         if(communicate_offline_id > -1)
             break;
         osDelay(1);

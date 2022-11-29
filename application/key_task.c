@@ -16,7 +16,7 @@ void key_task(void *argument)
         {
             // 最高位为1 说明发生错误
             
-            verbose_log("KEY event error.");
+            log_printf("KEY event error.");
             osDelay(200);
         }
         
@@ -30,11 +30,11 @@ void key_task(void *argument)
             RPCResponse res;
             if(remote_procedure_call(CMD_ECHO_REQUEST, (uint8_t*)str, strlen(str) + 1, CMD_ECHO_RESPONSE, &res, 5000))
             {
-                verbose_log("Echo response using %fms: \"%s\".", get_time_ms_us() - st, res.data);
+                log_printf("Echo response using %fms: \"%s\".", get_time_ms_us() - st, res.data);
             }
             else
             {
-                verbose_log("Echo response timeout.");
+                log_printf("Echo response timeout.");
             }
             
             osDelay(200);
@@ -44,7 +44,7 @@ void key_task(void *argument)
         {
             // 处理按键KEY_UP
             
-            verbose_log("KEY_UP is pressed.");
+            log_printf("KEY_UP is pressed.");
             osDelay(200);
         }
 

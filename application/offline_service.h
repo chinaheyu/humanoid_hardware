@@ -5,7 +5,7 @@
 
 typedef void (*offline_t)(void);
 
-int register_offline_callback(offline_t online_func, offline_t offline_func, uint32_t offline_time);
+int register_offline_callback(offline_t online_func, offline_t online_first_func, offline_t offline_func, offline_t offline_first_func, uint32_t offline_time);
 void delete_offline_callback(int id);
 void offline_hook(int id);
 

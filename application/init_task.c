@@ -23,7 +23,7 @@ SystemServices 8
 osThreadId_t shellTaskHandle;
 const osThreadAttr_t shellTask_attributes = {
   .name = "ShellTask",
-  .stack_size = 256 * 4,
+  .stack_size = 256 * 8,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
