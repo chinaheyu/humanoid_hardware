@@ -45,7 +45,7 @@ extern char *LOG_LEVEL_TAGS[];
             len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "\r\n");                                                                \
             if (LOG_TIMESTAMP_EN)                                                                                                            \
             {                                                                                                                                \
-                len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "[%d.%03d]", (int)get_time_ms() / 1000, (int)get_time_ms() % 1000); \
+                len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "[%d.%03d]", (int)get_machine_time_ms() / 1000, (int)get_machine_time_ms() % 1000); \
             }                                                                                                                                \
             len += snprintf(&log_str[len], LOG_OUTPUT_MAX_LEN - len, "[%s][%s]", LOG_TAG, LOG_LEVEL_TAGS[level]);                            \
             if (LOG_FUNCTION_EN)                                                                                                             \

@@ -34,7 +34,7 @@ int32_t get_period_start(uint32_t *id)
         if (SoftPerid[i].used == 0)
         {
             SoftPerid[i].used = 1;
-            SoftPerid[i].start_time = get_time_ms_us();
+            SoftPerid[i].start_time = get_machine_time_ms_us();
 
             *id = i;
             return E_OK;
@@ -51,7 +51,7 @@ int32_t get_period_start(uint32_t *id)
 float get_period_end(uint32_t id)
 {
     float period;
-    period = get_time_ms_us() - SoftPerid[id].start_time;
+    period = get_machine_time_ms_us() - SoftPerid[id].start_time;
     if ((SoftPerid[id].used == 1) && (id < MAX_PERIOD_NUM + 1))
     {
         SoftPerid[id].used = 0;
@@ -68,7 +68,7 @@ float get_period_end(uint32_t id)
   */
 float sin_freq_output(float sin_maxout, float sin_period, float sin_b)
 {
-    uint32_t tick = get_time_ms();
+    uint32_t tick = get_machine_time_ms();
     return sin_maxout * sin(2 * 3.14159265354 / sin_period * tick) + sin_b;
 }
 

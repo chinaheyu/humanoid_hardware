@@ -208,19 +208,39 @@ int32_t zeroerr_motor_update_once(void* zeroerr_motor)
     // 读取位置
     uint8_t data[4] = { 0x00, 0x02, 0x00, 0x01 };
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    if (motor->data.feedback_frame_counter != 3)
+    {
+        motor->data.feedback_frame_counter = 0;
+        return 0;
+    }
     
     // 读取速度
     data[1] = 0x05;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 4);
+    if (motor->data.feedback_frame_counter != 2)
+    {
+        motor->data.feedback_frame_counter = 0;
+        return 0;
+    }
     
     // 读取电流
     data[1] = 0x08;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    if (motor->data.feedback_frame_counter != 1)
+    {
+        motor->data.feedback_frame_counter = 0;
+        return 0;
+    }
 
     // 读取扭矩
     data[0] = 0x02;
     data[1] = 0x0D;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    if (motor->data.feedback_frame_counter != 0)
+    {
+        motor->data.feedback_frame_counter = 0;
+        return 0;
+    }
     
     return 0;
 }
@@ -306,7 +326,7 @@ int32_t zeroerr_feedback_callback(CAN_RxHeaderTypeDef *header, uint8_t *data)
 
 uint32_t zeroerr_can_std_transmit(can_manage_obj_t m_obj, uint16_t std_id, uint8_t *data, uint16_t len)
 {
-    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    osSemaphoreWait(zeroerr_semaphore_id, 1);
     can_std_transmit(m_obj, std_id, data, len);
 }
 

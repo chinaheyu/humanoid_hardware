@@ -99,8 +99,10 @@
     while(1);          \
   }
 
-uint32_t get_time_ms(void);
-uint32_t get_time_us(void);
-float get_time_ms_us(void);
+void set_timestamp(long long microseconds);
+uint32_t get_machine_time_ms(void);
+uint32_t get_machine_time_us(void);
+float get_machine_time_ms_us(void);
+long long get_timestamp(void);
 
 #endif // __SYS_INCLUDES_H__

@@ -59,25 +59,25 @@ int32_t beep_ctrl_times(void *argc)
     static uint8_t times;
 
     /* The beep works after the system starts 3s */
-    if (get_time_ms() / 1000 < 3)
+    if (get_machine_time_ms() / 1000 < 3)
     {
         return 0;
     }
 
-    if (get_time_ms() - beep_tick > BEEP_PERIOD)
+    if (get_machine_time_ms() - beep_tick > BEEP_PERIOD)
     {
         times = beep_times;
-        beep_tick = get_time_ms();
-        times_tick = get_time_ms();
+        beep_tick = get_machine_time_ms();
+        times_tick = get_machine_time_ms();
     }
     else if (times != 0)
     {
-        if (get_time_ms() - times_tick < BEEP_ON_TIME)
+        if (get_machine_time_ms() - times_tick < BEEP_ON_TIME)
         {
             beep_set_tune(BEEP_TUNE_VALUE, BEEP_CTRL_VALUE);
             LED_R_ON();
         }
-        else if (get_time_ms() - times_tick < BEEP_ON_TIME + BEEP_OFF_TIME)
+        else if (get_machine_time_ms() - times_tick < BEEP_ON_TIME + BEEP_OFF_TIME)
         {
             beep_set_tune(0, 0);
             LED_R_OFF();
@@ -85,7 +85,7 @@ int32_t beep_ctrl_times(void *argc)
         else
         {
             times--;
-            times_tick = get_time_ms();
+            times_tick = get_machine_time_ms();
         }
     }
 
@@ -101,10 +101,10 @@ int32_t green_led_toggle(void *argc)
 {
     static uint32_t led_tick;
 
-    if (get_time_ms() - led_tick > *(int *)argc)
+    if (get_machine_time_ms() - led_tick > *(int *)argc)
     {
         LED_G_TOGGLE();
-        led_tick = get_time_ms();
+        led_tick = get_machine_time_ms();
     }
 
     return 0;

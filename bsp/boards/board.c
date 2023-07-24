@@ -28,6 +28,9 @@
 
 #include "log.h"
 
+static long long timestamp_sync;
+static long long machine_time_sync;
+
 static struct app_manage *board_app;
 
 static publisher_t dbusPub;
@@ -118,17 +121,29 @@ void board_config(void)
     usart1_rx_callback_register(usart1_rx_callback);
 }
 
-uint32_t get_time_us(void)
+void set_timestamp(long long microseconds)
+{
+    timestamp_sync = microseconds;
+    machine_time_sync = 1000 * get_machine_time_ms() + get_machine_time_us();
+}
+
+uint32_t get_machine_time_us(void)
 {
     return TIM9->CNT;
 }
 
-uint32_t get_time_ms(void)
+uint32_t get_machine_time_ms(void)
 {
     return HAL_GetTick();
 }
 
-float get_time_ms_us(void)
+float get_machine_time_ms_us(void)
 {
-    return get_time_ms() + get_time_us() / 1000.0f;
+    return get_machine_time_ms() + get_machine_time_us() / 1000.0f;
+}
+
+long long get_timestamp(void)
+{
+    long long microseconds = 1000 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync + timestamp_sync;
+    return microseconds;
 }

@@ -76,7 +76,7 @@
 
 /* 获取时间戳宏定义 */
 #ifdef EVENT_USE_TIMESTAMP
-    #define EVENT_GET_TIMESTAMP()   get_time_ms()
+    #define EVENT_GET_TIMESTAMP()   get_machine_time_ms()
 #endif
 
 

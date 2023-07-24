@@ -17,6 +17,11 @@ osThreadId communication_task_t;
 
 void sync_machine_time(uint8_t *p_data, size_t len)
 {
+    // Set timestamp
+    cmd_sync_t* msg = (cmd_sync_t*)p_data;
+    set_timestamp(msg->timestamp);
+    
+    // Feedback
     size_t frame_size = protocol_calculate_frame_size(len);
     uint8_t* buffer = (uint8_t*)alloca(frame_size);
     protocol_pack_data_to_buffer(CMD_SYNC, p_data, len, buffer);
@@ -79,6 +84,7 @@ int32_t motor_feedback(void *argc)
 
         if (object->type == DEVICE_MOTOR)
         {
+            motor_feedback_msg.timestamp = get_timestamp();
             motor_feedback_msg.id = ((motor_device_t)object)->id;
             motor_feedback_msg.position = ((motor_device_t)object)->data.position;
             motor_feedback_msg.velocity = ((motor_device_t)object)->data.velocity;
@@ -118,6 +124,7 @@ int32_t gyro_feedback(void *argc)
 
         if (object->type == DEVICE_GYRO)
         {
+            gyro_feedback_msg.timestamp = get_timestamp();
             gyro_feedback_msg.roll = ((struct gyro_device*)object)->roll;
             gyro_feedback_msg.pitch = ((struct gyro_device*)object)->pitch;
             gyro_feedback_msg.yaw = ((struct gyro_device*)object)->yaw;
@@ -128,6 +135,8 @@ int32_t gyro_feedback(void *argc)
         
     /* leave critical */
     exit_critical();
+    
+    usb_tx_flush(NULL);
 
     /* not found */
     return NULL;

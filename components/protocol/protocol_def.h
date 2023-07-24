@@ -11,12 +11,13 @@
 #define CMD_SYNC (0x0001)
 typedef struct 
 {
-    long long microseconds;
+    long long timestamp;    // microseconds
 } cmd_sync_t;
 
 #define CMD_GYRO_FEEDBACK (0x0101)
 typedef struct 
 {
+    long long timestamp;
     float roll;
     float pitch;
     float yaw;
@@ -25,6 +26,7 @@ typedef struct
 #define CMD_MOTOR_FEEDBACK (0x0102)
 typedef struct 
 {
+    long long timestamp;
     unsigned char id;
     float position;
     float velocity;
