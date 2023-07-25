@@ -114,7 +114,7 @@ void board_config(void)
     /* DBUS message */
     EventPostInit(&dbusPub, DBUS_MSG, DBUS_MSG_LEN);
 
-    soft_timer_register(usb_tx_flush, NULL, 1);
+    //soft_timer_register(usb_tx_flush, NULL, 1);
     soft_timer_register(beep_ctrl_times, NULL, 1);
     soft_timer_register(green_led_toggle, &status_led_period, 5);
 
@@ -144,6 +144,7 @@ float get_machine_time_ms_us(void)
 
 long long get_timestamp(void)
 {
-    long long microseconds = 1000 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync + timestamp_sync;
+    // 不知道为什么STM32和Jetson AGX Orin的时钟不同步，乘个系数校准一下
+    long long microseconds = (1000.0 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync) * (1000000.0 / 1000045.0) + timestamp_sync;
     return microseconds;
 }

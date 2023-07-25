@@ -26,7 +26,6 @@ void sync_machine_time(uint8_t *p_data, size_t len)
     uint8_t* buffer = (uint8_t*)alloca(frame_size);
     protocol_pack_data_to_buffer(CMD_SYNC, p_data, len, buffer);
     usb_interface_send(buffer, frame_size);
-    usb_tx_flush(NULL);
 }
 
 void dispatch_frame(uint16_t cmd_id, uint8_t *p_data, size_t len)
@@ -37,12 +36,15 @@ void dispatch_frame(uint16_t cmd_id, uint8_t *p_data, size_t len)
     case CMD_SYNC:
         sync_machine_time(p_data, len);
         break;
+    case CMD_RESET:
+        HAL_NVIC_SystemReset();
+        break;
     case CMD_MOTOR_MIT:
         motor_mit_msg = (cmd_motor_mit_t*)p_data;
-        motor_mit_control(motor_mit_msg->id, motor_mit_msg->position, motor_mit_msg->velocity, motor_mit_msg->kp, motor_mit_msg->kd, motor_mit_msg->torque);
+        motor_mit_control(motor_mit_msg->id, motor_mit_msg->position / 1000.0f, motor_mit_msg->velocity / 1000.0f, motor_mit_msg->kp / 1000.0f, motor_mit_msg->kd / 1000.0f, motor_mit_msg->torque / 1000.0f);
         break;
     case CMD_MOTOR_POSITION:
-        motor_position_control(((cmd_motor_position_t*)p_data)->id, ((cmd_motor_position_t*)p_data)->position);
+        motor_position_control(((cmd_motor_position_t*)p_data)->id, ((cmd_motor_position_t*)p_data)->position / 1000.0f);
         break;
     default:
         break;
@@ -86,9 +88,9 @@ int32_t motor_feedback(void *argc)
         {
             motor_feedback_msg.timestamp = get_timestamp();
             motor_feedback_msg.id = ((motor_device_t)object)->id;
-            motor_feedback_msg.position = ((motor_device_t)object)->data.position;
-            motor_feedback_msg.velocity = ((motor_device_t)object)->data.velocity;
-            motor_feedback_msg.torque = ((motor_device_t)object)->data.torque;
+            motor_feedback_msg.position = (uint16_t)(((motor_device_t)object)->data.position * 1000.0f);
+            motor_feedback_msg.velocity = (uint16_t)(((motor_device_t)object)->data.velocity * 1000.0f);
+            motor_feedback_msg.torque = (uint16_t)(((motor_device_t)object)->data.torque * 1000.0f);
             size_t frame_size = protocol_pack_data_to_buffer(CMD_MOTOR_FEEDBACK, (uint8_t*)&motor_feedback_msg, sizeof(cmd_motor_feedback_t), msg_buf);
             usb_interface_send(msg_buf, frame_size);
         }
@@ -96,8 +98,6 @@ int32_t motor_feedback(void *argc)
         
     /* leave critical */
     exit_critical();
-    
-    usb_tx_flush(NULL);
 
     /* not found */
     return NULL;
@@ -125,9 +125,9 @@ int32_t gyro_feedback(void *argc)
         if (object->type == DEVICE_GYRO)
         {
             gyro_feedback_msg.timestamp = get_timestamp();
-            gyro_feedback_msg.roll = ((struct gyro_device*)object)->roll;
-            gyro_feedback_msg.pitch = ((struct gyro_device*)object)->pitch;
-            gyro_feedback_msg.yaw = ((struct gyro_device*)object)->yaw;
+            gyro_feedback_msg.roll = (uint16_t)(((struct gyro_device*)object)->roll * 1000.0f);
+            gyro_feedback_msg.pitch = (uint16_t)(((struct gyro_device*)object)->pitch * 1000.0f);
+            gyro_feedback_msg.yaw = (uint16_t)(((struct gyro_device*)object)->yaw * 1000.0f);
             size_t frame_size = protocol_pack_data_to_buffer(CMD_GYRO_FEEDBACK, (uint8_t*)&gyro_feedback_msg, sizeof(cmd_gyro_feedback_t), msg_buf);
             usb_interface_send(msg_buf, frame_size);
         }
@@ -135,8 +135,6 @@ int32_t gyro_feedback(void *argc)
         
     /* leave critical */
     exit_critical();
-    
-    usb_tx_flush(NULL);
 
     /* not found */
     return NULL;
@@ -148,7 +146,7 @@ void communication_task(void const* arg)
     usb_vcp_rx_callback_register(unpack_bytes);
 
     soft_timer_register(motor_feedback, NULL, 1);
-    soft_timer_register(gyro_feedback, NULL, 5);
+    soft_timer_register(gyro_feedback, NULL, 10);
 
     for(;;)
     {
