@@ -29,6 +29,7 @@ osThreadId timer_task_t;
 void soft_timer_FreeRTOS_init(void)
 {
     osThreadDef(TIMER_1MS, timer_task, OS_TIMER_PRIORITY, 0, OS_TIMER_STACK_SIZE);
+    //osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, OS_TIMER_STACK_SIZE);
     timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 }
 

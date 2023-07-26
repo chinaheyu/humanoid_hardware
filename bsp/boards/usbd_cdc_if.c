@@ -298,13 +298,13 @@ uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 {
     uint8_t result = USBD_OK;
     /* USER CODE BEGIN 7 */
-    //fifo_s_puts(&usb_tx_fifo, (char *)Buf, Len);
-      USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-      if (hcdc->TxState != 0){
-        return USBD_BUSY;
-      }
-      USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-      result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+    fifo_s_puts(&usb_tx_fifo, (char *)Buf, Len);
+//    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+//    if (hcdc->TxState != 0){
+//        return USBD_BUSY;
+//    }
+//    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
+//    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
     /* USER CODE END 7 */
     return result;
 }
@@ -351,6 +351,7 @@ int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
 uint32_t usb_interface_send(uint8_t *p_data, uint16_t len)
 {
     CDC_Transmit_FS(p_data, len);
+    usb_tx_flush(NULL);
     return 0;
 }
 

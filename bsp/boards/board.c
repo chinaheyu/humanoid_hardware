@@ -144,7 +144,6 @@ float get_machine_time_ms_us(void)
 
 long long get_timestamp(void)
 {
-    // 不知道为什么STM32和Jetson AGX Orin的时钟不同步，乘个系数校准一下
-    long long microseconds = (1000.0 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync) * (1000000.0 / 1000045.0) + timestamp_sync;
+    long long microseconds = 1000.0 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync + timestamp_sync;
     return microseconds;
 }
