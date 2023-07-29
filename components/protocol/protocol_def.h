@@ -20,9 +20,9 @@ typedef struct
 typedef struct 
 {
     long long timestamp;
-    unsigned short roll;
-    unsigned short pitch;
-    unsigned short yaw;
+    short roll;
+    short pitch;
+    short yaw;
 } cmd_gyro_feedback_t;
 
 #define CMD_MOTOR_FEEDBACK (0x0102)
@@ -30,27 +30,27 @@ typedef struct
 {
     long long timestamp;
     unsigned char id;
-    unsigned short position;
-    unsigned short velocity;
-    unsigned short torque;
+    short position;
+    short velocity;
+    short torque;
 } cmd_motor_feedback_t;
 
 #define CMD_MOTOR_MIT (0x0201)
 typedef struct 
 {
     unsigned char id;
-    unsigned short position;
-    unsigned short velocity;
-    unsigned short kp;
-    unsigned short kd;
-    unsigned short torque;
+    short position;
+    short velocity;
+    short kp;
+    short kd;
+    short torque;
 } cmd_motor_mit_t;
 
 #define CMD_MOTOR_POSITION (0x0202)
 typedef struct 
 {
     unsigned char id;
-    unsigned short position;
+    short position;
 } cmd_motor_position_t;
 
 #pragma pack(pop)

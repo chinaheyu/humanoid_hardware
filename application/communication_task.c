@@ -8,7 +8,6 @@
 #include "event.h"
 #include "os_timer.h"
 #include "motor.h"
-#include "gyro.h"
 
 #define PROTOCOL_MAX_FRAME_LENGTH (1000)
 static protocol_stream_t unpack_stream_object;
@@ -88,9 +87,9 @@ int32_t motor_feedback(void *argc)
         {
             motor_feedback_msg.timestamp = get_timestamp();
             motor_feedback_msg.id = ((motor_device_t)object)->id;
-            motor_feedback_msg.position = (uint16_t)(((motor_device_t)object)->data.position * 1000.0f);
-            motor_feedback_msg.velocity = (uint16_t)(((motor_device_t)object)->data.velocity * 1000.0f);
-            motor_feedback_msg.torque = (uint16_t)(((motor_device_t)object)->data.torque * 1000.0f);
+            motor_feedback_msg.position = (int16_t)(((motor_device_t)object)->data.position * 1000.0f);
+            motor_feedback_msg.velocity = (int16_t)(((motor_device_t)object)->data.velocity * 1000.0f);
+            motor_feedback_msg.torque = (int16_t)(((motor_device_t)object)->data.torque * 1000.0f);
             size_t frame_size = protocol_pack_data_to_buffer(CMD_MOTOR_FEEDBACK, (uint8_t*)&motor_feedback_msg, sizeof(cmd_motor_feedback_t), msg_buf);
             usb_interface_send(msg_buf, frame_size);
         }
@@ -103,7 +102,7 @@ int32_t motor_feedback(void *argc)
     return NULL;
 }
 
-int32_t gyro_feedback(void *argc)
+void gyro_feedback(struct ahrs_sensor* sensor)
 {
     struct device *object;
     list_t *node = NULL;
@@ -111,9 +110,6 @@ int32_t gyro_feedback(void *argc)
     
     cmd_gyro_feedback_t gyro_feedback_msg;
     uint8_t* msg_buf = (uint8_t*)alloca(protocol_calculate_frame_size(sizeof(cmd_gyro_feedback_t)));
-
-    var_cpu_sr();
-    enter_critical();
 
     information = get_device_information();
     for (node = information->object_list.next;
@@ -125,19 +121,13 @@ int32_t gyro_feedback(void *argc)
         if (object->type == DEVICE_GYRO)
         {
             gyro_feedback_msg.timestamp = get_timestamp();
-            gyro_feedback_msg.roll = (uint16_t)(((struct gyro_device*)object)->roll * 1000.0f);
-            gyro_feedback_msg.pitch = (uint16_t)(((struct gyro_device*)object)->pitch * 1000.0f);
-            gyro_feedback_msg.yaw = (uint16_t)(((struct gyro_device*)object)->yaw * 1000.0f);
+            gyro_feedback_msg.roll = (int16_t)(sensor->roll * 1000.0f);
+            gyro_feedback_msg.pitch = (int16_t)(sensor->pitch * 1000.0f);
+            gyro_feedback_msg.yaw = (int16_t)(sensor->yaw * 1000.0f);
             size_t frame_size = protocol_pack_data_to_buffer(CMD_GYRO_FEEDBACK, (uint8_t*)&gyro_feedback_msg, sizeof(cmd_gyro_feedback_t), msg_buf);
             usb_interface_send(msg_buf, frame_size);
         }
     }
-        
-    /* leave critical */
-    exit_critical();
-
-    /* not found */
-    return NULL;
 }
 
 void communication_task(void const* arg)
@@ -146,7 +136,6 @@ void communication_task(void const* arg)
     usb_vcp_rx_callback_register(unpack_bytes);
 
     soft_timer_register(motor_feedback, NULL, 1);
-    soft_timer_register(gyro_feedback, NULL, 10);
 
     for(;;)
     {

@@ -22,6 +22,7 @@
 #include "cmsis_os.h"
 #include "sensor_task.h"
 #include "gyro.h"
+#include "communication_task.h"
 
 static void sensor_task(void const *argc);
 
@@ -75,6 +76,7 @@ void sensor_task(void const *argc)
         gyro_dev_obj.yaw = gyro_sensor.yaw;
 
         EventMsgPost(&ahrsPub, &gyro_sensor, AHRS_MSG_LEN);
+        gyro_feedback(&gyro_sensor);
 
         ahrs_run_time = get_period_end(time_id);
 

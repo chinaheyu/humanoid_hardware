@@ -298,7 +298,22 @@ uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 {
     uint8_t result = USBD_OK;
     /* USER CODE BEGIN 7 */
-    fifo_s_puts(&usb_tx_fifo, (char *)Buf, Len);
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+    if (hcdc->TxState != 0){
+        fifo_s_puts(&usb_tx_fifo, (char *)Buf, Len);
+        return USBD_BUSY;
+    }
+    else
+    {
+        if (Len > APP_TX_DATA_SIZE)
+        {
+            fifo_s_puts(&usb_tx_fifo, (char *)(Buf + APP_TX_DATA_SIZE), Len - APP_TX_DATA_SIZE);
+            Len = APP_TX_DATA_SIZE;
+        }
+        memcpy(UserTxBufferFS, Buf, Len);
+        USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, Len);
+        result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+    }
 //    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
 //    if (hcdc->TxState != 0){
 //        return USBD_BUSY;
@@ -313,28 +328,20 @@ uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 
 int32_t usb_tx_flush(void *argc)
 {
-    var_cpu_sr();
-
     uint8_t result = USBD_OK;
     USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceFS.pClassData;
-
-    if (hcdc->TxState != 0)
+    uint32_t send_num = usb_tx_fifo.used_num;
+    if (send_num != 0)
     {
-        return USBD_BUSY;
-    }
-    else
-    {
-        uint32_t send_num;
-
-        enter_critical();
-        send_num = usb_tx_fifo.used_num;
+        if (send_num > APP_TX_DATA_SIZE)
+        {
+            send_num = APP_TX_DATA_SIZE;
+        }
         fifo_s_gets_noprotect(&usb_tx_fifo, (char *)UserTxBufferFS, send_num);
-        exit_critical();
-
         USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, send_num);
         result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-        return result;
     }
+    return result;
 }
 
 int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
@@ -351,7 +358,6 @@ int32_t usb_vcp_rx_callback_register(usb_vcp_call_back_f fun)
 uint32_t usb_interface_send(uint8_t *p_data, uint16_t len)
 {
     CDC_Transmit_FS(p_data, len);
-    usb_tx_flush(NULL);
     return 0;
 }
 
