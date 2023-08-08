@@ -38,6 +38,19 @@ void sensor_task_init(void)
 
 float ahrs_run_time;
 
+void gyro_feedback(struct ahrs_sensor* sensor)
+{
+    cmd_gyro_feedback_t gyro_feedback_msg;
+    uint8_t* msg_buf = (uint8_t*)alloca(protocol_calculate_frame_size(sizeof(cmd_gyro_feedback_t)));
+
+    gyro_feedback_msg.timestamp = get_timestamp();
+    gyro_feedback_msg.roll = (int16_t)(sensor->roll * 1000.0f);
+    gyro_feedback_msg.pitch = (int16_t)(sensor->pitch * 1000.0f);
+    gyro_feedback_msg.yaw = (int16_t)(sensor->yaw * 1000.0f);
+    size_t frame_size = protocol_pack_data_to_buffer(CMD_GYRO_FEEDBACK, (uint8_t*)&gyro_feedback_msg, sizeof(cmd_gyro_feedback_t), msg_buf);
+    usb_interface_send(msg_buf, frame_size);
+}
+
 /**
   * @brief  sensor publisher
   * @param
@@ -57,7 +70,6 @@ void sensor_task(void const *argc)
     bmi088_get_offset();
 
     imu_temp_ctrl_init();
-    soft_timer_register(imu_temp_keep, (void *)NULL, 5);
 
     EventPostInit(&ahrsPub, AHRS_MSG, AHRS_MSG_LEN);
     

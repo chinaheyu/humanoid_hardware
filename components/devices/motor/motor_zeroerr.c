@@ -252,11 +252,6 @@ zeroerr_motor_device_t zeroerr_motor_find_by_canid(uint16_t can_id)
     list_t *node = NULL;
     struct device_information *information;
 
-    var_cpu_sr();
-
-    /* enter critical */
-    enter_critical();
-
     /* try to find device object */
     information = get_device_information();
 
@@ -272,15 +267,11 @@ zeroerr_motor_device_t zeroerr_motor_find_by_canid(uint16_t can_id)
             {
                 if (((zeroerr_motor_device_t)object)->can_id == can_id)
                 {
-                    exit_critical();
                     return (zeroerr_motor_device_t)object;
                 }
             }
         }
     }
-        
-    /* leave critical */
-    exit_critical();
 
     /* not found */
     return NULL;
@@ -328,6 +319,7 @@ uint32_t zeroerr_can_std_transmit(can_manage_obj_t m_obj, uint16_t std_id, uint8
 {
     osSemaphoreWait(zeroerr_semaphore_id, 1);
     can_std_transmit(m_obj, std_id, data, len);
+    return 0;
 }
 
 int32_t littleEndianToBigEndian(int32_t value) {

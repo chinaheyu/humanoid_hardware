@@ -22,6 +22,8 @@
 #include "soft_timer.h"
 #include "period.h"
 
+#define soft_timer_register(func, argc, ticks) __soft_timer_register((func), (argc), (ticks), (#func))
+
 typedef int32_t (*soft_timer_callback)(void *argc);
 
 struct soft_timer
@@ -36,7 +38,7 @@ struct soft_timer
 #define OS_TIMER_PRIORITY      osPriorityNormal
 
 void soft_timer_FreeRTOS_init(void);
-int32_t soft_timer_register(soft_timer_callback func, void *argc, uint32_t ticks);
+int32_t __soft_timer_register(soft_timer_callback func, void *argc, uint32_t ticks, const char *callback_name);
 void timer_task(void const *argument);
 
 #endif // __TIMER_TASK_H__

@@ -17,6 +17,10 @@
 
 #include "os_timer.h"
 
+#define LOG_TAG "timer"
+#define LOG_OUTPUT_LEVEL 4
+#include "log.h"
+
 struct soft_timer soft_timer[TIMER_ELEMENT_NUM_MAX + 1];
 
 osThreadId timer_task_t;
@@ -29,7 +33,6 @@ osThreadId timer_task_t;
 void soft_timer_FreeRTOS_init(void)
 {
     osThreadDef(TIMER_1MS, timer_task, OS_TIMER_PRIORITY, 0, OS_TIMER_STACK_SIZE);
-    //osThreadDef(TIMER_1MS, timer_task, osPriorityHigh, 0, OS_TIMER_STACK_SIZE);
     timer_task_t = osThreadCreate(osThread(TIMER_1MS), NULL);
 }
 
@@ -38,7 +41,7 @@ void soft_timer_FreeRTOS_init(void)
   * @param[in] call_back_fucn/param/period
   * @retval    timer id
   */
-int32_t soft_timer_register(soft_timer_callback callback_t, void *argc, uint32_t ticks)
+int32_t __soft_timer_register(soft_timer_callback callback_t, void *argc, uint32_t ticks, const char *callback_name)
 {
     for (int i = 1; i < TIMER_ELEMENT_NUM_MAX + 1; i++)
     {
@@ -48,6 +51,7 @@ int32_t soft_timer_register(soft_timer_callback callback_t, void *argc, uint32_t
             soft_timer[i].ticks = ticks;
             soft_timer[i].argc = argc;
             soft_timer[i].callback = callback_t;
+            log_i("Soft timer callback is registered, ticks: %d, callback: %s().", ticks, callback_name);
             return i;
         }
     }

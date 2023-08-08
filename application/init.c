@@ -17,15 +17,15 @@
 
 #include "main.h"
 #include "can.h"
-
+#include "app_manage.h"
 #include "board.h"
 #include "init.h"
 #include "easyflash.h"
 #include "shell.h"
+#include "drv_io.h"
 
 #include "sensor_task.h"
 #include "communication_task.h"
-#include "test.h"
 
 #include "SEGGER_SYSVIEW.h"
 
@@ -33,10 +33,33 @@
 
 void hw_init(void);
 
+uint8_t get_appid_from_flash()
+{
+    size_t read_len = 0;
+    uint8_t application_id;
+    ef_get_env_blob(APPID_KEY, &application_id, 1, &read_len);
+
+    if (read_len == 1)
+    {
+        return application_id;
+    }
+    return 0;
+}
+
 void task_init(void)
 {
     communication_task_init();
-    test_task_init();
+    uint8_t appid = get_appid_from_flash();
+    app_task_init(appid);
+    
+    // Initializa finished.
+    beep_set_tune(500, 150);
+    osDelay(150);
+    beep_set_tune(400, 100);
+    osDelay(150);
+    beep_set_tune(300, 50);
+    osDelay(150);
+    beep_set_tune(0, 0);
 }
 
 void sys_task(void)

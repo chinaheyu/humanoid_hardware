@@ -16,10 +16,52 @@
  ***************************************************************************/
 
 #include "app_manage.h"
+#include "test.h"
+#include "head_control_task.h"
+#include "leg_control_task.h"
+
+#define LOG_TAG "app_manage"
+#define LOG_OUTPUT_LEVEL 4
+#include "log.h"
 
 struct app_manage current_app;
+
+struct app_table
+{
+    const char* app_name;
+    void(*app_init_fn)(void);
+}
+
+static app_table[] = {
+    {"TEST", test_task_init},
+    {"HEAD_CONTROL", head_control_task_init},
+    {"LEG_CONTROL", leg_control_task_init}
+};
 
 struct app_manage *get_current_app(void)
 {
     return &current_app;
+}
+
+void app_task_init(uint8_t app_id)
+{
+    current_app.app_id = app_id;
+    if (app_id < sizeof(app_table) / sizeof(app_table[0]))
+    {
+        log_i("Application init: %s", app_table[app_id].app_name);
+        app_table[app_id].app_init_fn();
+    }
+    else
+    {
+        log_e("Application id not exist: %d", app_id);
+    }
+}
+
+void print_app_table()
+{
+    for (int i = 0; i < sizeof(app_table) / sizeof(app_table[0]); i++)
+    {
+        log_printf("\r\n%d: %s", i, app_table[i].app_name);
+    }
+    log_printf("\r\nCurrent app is %s.\r\n", app_table[current_app.app_id].app_name);
 }

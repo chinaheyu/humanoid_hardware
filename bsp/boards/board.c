@@ -37,14 +37,6 @@ static publisher_t dbusPub;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == GPIO_PIN_6)
-    {
-        if (board_app->user_input_callback)
-        {
-            board_app->user_input_callback();
-        }
-    }
-
     if (GPIO_Pin == GPIO_PIN_0)
     {
         if (board_app->user_key_callback)
@@ -101,6 +93,8 @@ void board_config(void)
                "************Humanoid Robot Shell************\r\n");
     log_printf("* Copy right: All right reserved.\r\n");
     log_printf("* Release Time: %s.\r\n", __TIME__);
+    log_printf("* UUID: %08X%08X%08X.\r\n", *(uint32_t *)(UID_BASE), *(uint32_t *)(UID_BASE + 0x4), *(uint32_t *)(UID_BASE + 0x8));
+    log_printf("* USB Serial: %08X%04X.\r\n", (*(uint32_t *)(UID_BASE)) + (*(uint32_t *)(UID_BASE + 0x8)), *(uint16_t *)(UID_BASE + 0x6));
     log_printf("********************************************\r\n");
 
     board_app = get_current_app();

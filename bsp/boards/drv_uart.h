@@ -66,7 +66,6 @@ void usart1_transmit(uint8_t *buff, uint16_t len);
 void usart6_transmit(uint8_t *buff, uint16_t len);
 void usart1_idle_callback(void);
 void usart6_idle_callback(void);
-uint32_t uart6_rx_data_handle(uint8_t *buff, uint32_t len);
 void usart1_rx_callback_register(usart_call_back fun);
 void usart6_rx_callback_register(usart_call_back fun);
 

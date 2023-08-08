@@ -23,11 +23,13 @@
 
 struct app_manage
 {
+    uint8_t app_id;
     void (*dbus_rx_complete)(void);
-
     void (*user_key_callback)(void);
-    void (*user_input_callback)(void);
 };
 
 struct app_manage *get_current_app(void);
+void app_task_init(uint8_t app_id);
+void print_app_table();
+
 #endif

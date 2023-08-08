@@ -127,11 +127,6 @@ tmotor_motor_device_t tmotor_motor_find_by_canid(uint16_t can_id)
     list_t *node = NULL;
     struct device_information *information;
 
-    var_cpu_sr();
-
-    /* enter critical */
-    enter_critical();
-
     /* try to find device object */
     information = get_device_information();
 
@@ -147,15 +142,11 @@ tmotor_motor_device_t tmotor_motor_find_by_canid(uint16_t can_id)
             {
                 if (((tmotor_motor_device_t)object)->can_id == can_id)
                 {
-                    exit_critical();
                     return (tmotor_motor_device_t)object;
                 }
             }
         }
     }
-        
-    /* leave critical */
-    exit_critical();
 
     /* not found */
     return NULL;

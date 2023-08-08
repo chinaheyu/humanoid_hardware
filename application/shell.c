@@ -19,18 +19,17 @@
 #include "log.h"
 #include "sys.h"
 #include "cli_process.h"
-
+#include "easyflash.h"
 #include "board.h"
 #include "fifo.h"
 #include "shell.h"
+#include "init.h"
 
 /* 命令行密码 */
 #define CLI_PWD "humanoid"
 static uint8_t is_login_success;
 
 /************************************** 环境变量 ***********************************/
-void ef_print_env(void);
-
 int env_command(char *write_buf, int buf_len, const char *cmd_str);
 
 cli_cmd_t env_cmd =
@@ -40,24 +39,48 @@ cli_cmd_t env_cmd =
     "\r\nenv\r\n"
     "env value print\r\n",
     .cli_cmd_handler = env_command,
-    .expect_param_num = 1
+    .expect_param_num = 0
 };
 int env_command(char *write_buf, int buf_len, const char *cmd_str)
+{
+    ef_print_env();
+    return 0;
+}
+
+/************************************** 设置应用 ***********************************/
+extern void print_app_table();
+
+int app_command(char *write_buf, int buf_len, const char *cmd_str);
+
+cli_cmd_t app_cmd =
+{
+    .cmd_str = "app",
+    .help_str =
+    "\r\napp\r\n"
+    "select app\r\n",
+    .cli_cmd_handler = app_command,
+    .expect_param_num = -1
+};
+
+int app_command(char *write_buf, int buf_len, const char *cmd_str)
 {
     const char *param[1];
     int param_len[1];
 
     param[0] = cli_get_param(cmd_str, 1, &param_len[0]);
-
-    if (strcmp(param[0], "print") == 0)
+    cli_get_param_end(cmd_str);
+    if (param_len[0] > 0)
     {
-        ef_print_env();
+        uint8_t appid = atoi(param[0]);
+        ef_set_env_blob(APPID_KEY, &appid, 1);
+        strcpy(write_buf, "Set app success.\r\n");
+        HAL_NVIC_SystemReset();
     }
     else
     {
-        strcpy(write_buf, "incorrect param!\r\n");
+        print_app_table();
+        strcpy(write_buf, "\r\nPlease select an application id.");
     }
-
     return 0;
 }
 
@@ -87,6 +110,7 @@ int pwd_command(char *write_buf, int buf_len, const char *cmd_str)
         {
             is_login_success = 1;
             cli_cmd_register(&env_cmd);
+            cli_cmd_register(&app_cmd);
         }
     }
     else

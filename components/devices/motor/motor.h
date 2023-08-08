@@ -24,5 +24,6 @@
 
 void motor_mit_control(uint8_t id, float position, float velocity, float kp, float kd, float torque);
 void motor_position_control(uint8_t id, float position);
+int32_t motor_feedback(void *argc);
 
 #endif // __MOTOR_H__

@@ -49,10 +49,10 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>..\build\MDK-ARM\</OutputDirectory>
-          <OutputName>standard</OutputName>
+          <OutputName>humanoid</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>..\build\MDK-ARM\</ListingPath>
@@ -82,8 +82,8 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
-            <UserProg1Name>fromelf.exe  --bin -o ./bin/standard.bin ../build/MDK-ARM/@p.axf</UserProg1Name>
-            <UserProg2Name>fromelf.exe  -c ../build/MDK-ARM/@p.axf -o ./bin/standard.lss</UserProg2Name>
+            <UserProg1Name>fromelf.exe  --bin -o ./bin/humanoid.bin ../build/MDK-ARM/@p.axf</UserProg1Name>
+            <UserProg2Name>fromelf.exe  -c ../build/MDK-ARM/@p.axf -o ./bin/humanoid.lss</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>
@@ -409,14 +409,24 @@
               <FilePath>..\application\event.h</FilePath>
             </File>
             <File>
+              <FileName>communication_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\communication_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>head_control_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\head_control_task.c</FilePath>
+            </File>
+            <File>
               <FileName>test.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\test.c</FilePath>
             </File>
             <File>
-              <FileName>communication_task.c</FileName>
+              <FileName>leg_control_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\application\communication_task.c</FilePath>
+              <FilePath>..\application\leg_control_task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -522,6 +532,11 @@
               <FileName>gyro.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\components\devices\gyro.c</FilePath>
+            </File>
+            <File>
+              <FileName>maestro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\components\devices\maestro.c</FilePath>
             </File>
           </Files>
         </Group>

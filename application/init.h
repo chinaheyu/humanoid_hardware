@@ -18,8 +18,7 @@
 #ifndef __INIT_H__
 #define __INIT_H__
 
-#define CHASSIS_APP 1
-#define GIMBAL_APP  0
+#define APPID_KEY "APPLICATION"
 
 #include "os_timer.h"
 
