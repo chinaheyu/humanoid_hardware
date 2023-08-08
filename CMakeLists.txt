@@ -36,8 +36,8 @@ set(INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/application
 )
 
-file(GLOB_RECURSE components_sources "components" "*.c")
-file(GLOB_RECURSE application_sources "application" "*.c")
+file(GLOB_RECURSE components_sources RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "components/*.c")
+file(GLOB_RECURSE application_sources RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "application/*.c")
 
 set(sdk_sources
     bsp/boards/board.c
