@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8.12)
 
 # Project specific settings
-set(application_name "standard")
+set(application_name "humanoid")
 set(BMI088_DIR ${CMAKE_SOURCE_DIR}/components/bmi088)
 
 project (${application_name} C CXX ASM)
@@ -28,16 +28,16 @@ set(INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/components/event_mgr
     ${CMAKE_SOURCE_DIR}/components/log
     ${CMAKE_SOURCE_DIR}/components/devices
-    ${CMAKE_SOURCE_DIR}/components/modules
+    ${CMAKE_SOURCE_DIR}/components/devices/motor
     ${CMAKE_SOURCE_DIR}/components/protocol
-    ${CMAKE_SOURCE_DIR}/components/referee
     ${CMAKE_SOURCE_DIR}/components/soft_timer
     ${CMAKE_SOURCE_DIR}/components/support
     ${CMAKE_SOURCE_DIR}/components/systemview
     ${CMAKE_SOURCE_DIR}/application
-    ${CMAKE_SOURCE_DIR}/application/chassis
-    ${CMAKE_SOURCE_DIR}/application/gimbal
 )
+
+file(GLOB_RECURSE components_sources "components" "*.c")
+file(GLOB_RECURSE application_sources "application" "*.c")
 
 set(sdk_sources
     bsp/boards/board.c
@@ -105,61 +105,8 @@ set(sdk_sources
     bsp/cubemx/USB_DEVICE/App/usb_device.c
     bsp/cubemx/USB_DEVICE/App/usbd_desc.c
     bsp/cubemx/USB_DEVICE/Target/usbd_conf.c
-    components/algorithm/mecanum.c
-    components/algorithm/pid.c
-    components/algorithm/ramp.c
-    components/bmi088/AHRS_middleware.c
-    components/bmi088/BMI088driver.c
-    components/bmi088/BMI088Middleware.c
-    components/bmi088/user_lib.c
-    components/bmi088/libm_error.c
-    components/cli/cli_history.c
-    components/cli/cli_interpreter.c
-    components/cli/cli_process.c
-    components/devices/dbus.c
-    components/devices/device.c
-    components/devices/motor.c
-    components/devices/single_gyro.c
-    components/easyflash/port/ef_port.c
-    components/easyflash/src/easyflash.c
-    components/easyflash/src/ef_env.c
-    components/easyflash/src/ef_iap.c
-    components/easyflash/src/ef_log.c
-    components/easyflash/src/ef_utils.c
-    components/event_mgr/event_mgr.c
-    components/event_mgr/memory_mgr.c
-    components/log/log.c
-    components/modules/chassis.c
-    components/modules/gimbal.c
-    components/modules/shoot.c
-    components/protocol/protocol.c
-    components/protocol/protocol_common.c
-    components/protocol/protocol_interface.c
-    components/protocol/protocol_transmit.c
-    components/referee/referee_system.c
-    components/soft_timer/os_timer.c
-    components/soft_timer/period.c
-    components/soft_timer/soft_timer.c
-    components/support/fifo.c
-    components/support/mem_mang4.c
-    components/support/mf_crc.c
-    components/systemview/SEGGER_RTT.c
-    components/systemview/SEGGER_SYSVIEW.c
-    components/systemview/SEGGER_SYSVIEW_Config_FreeRTOS.c
-    components/systemview/SEGGER_SYSVIEW_FreeRTOS.c
-    application/app_manage.c
-    application/communicate.c
-    application/init.c
-    application/offline_service.c
-    application/sensor_task.c
-    application/shell.c
-    application/chassis/chassis_app.c
-    application/chassis/chassis_cmd.c
-    application/chassis/chassis_task.c
-    application/gimbal/gimbal_app.c
-    application/gimbal/gimbal_cmd.c
-    application/gimbal/gimbal_task.c
-    application/gimbal/shoot_task.c
+    ${components_sources}
+    ${application_sources}
 )
 
 # set the build type
