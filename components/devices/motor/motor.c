@@ -7,9 +7,6 @@ void motor_mit_control(uint8_t id, float position, float velocity, float kp, flo
     list_t *node = NULL;
     struct device_information *information;
 
-    var_cpu_sr();
-    enter_critical();
-
     information = get_device_information();
     for (node = information->object_list.next;
             node != &(information->object_list);
@@ -33,9 +30,6 @@ void motor_mit_control(uint8_t id, float position, float velocity, float kp, flo
             }
         }
     }
-        
-    /* leave critical */
-    exit_critical();
 }
 
 void motor_position_control(uint8_t id, float position)
@@ -43,9 +37,6 @@ void motor_position_control(uint8_t id, float position)
     struct device *object;
     list_t *node = NULL;
     struct device_information *information;
-
-    var_cpu_sr();
-    enter_critical();
 
     information = get_device_information();
     for (node = information->object_list.next;
@@ -70,9 +61,6 @@ void motor_position_control(uint8_t id, float position)
             }
         }
     }
-        
-    /* leave critical */
-    exit_critical();
 }
 
 int32_t motor_feedback(void *argc)
@@ -83,9 +71,6 @@ int32_t motor_feedback(void *argc)
     
     cmd_motor_feedback_t motor_feedback_msg;
     uint8_t* msg_buf = (uint8_t*)alloca(protocol_calculate_frame_size(sizeof(cmd_motor_feedback_t)));
-
-    var_cpu_sr();
-    enter_critical();
 
     information = get_device_information();
     for (node = information->object_list.next;
@@ -105,10 +90,6 @@ int32_t motor_feedback(void *argc)
             usb_interface_send(msg_buf, frame_size);
         }
     }
-        
-    /* leave critical */
-    exit_critical();
-
     /* not found */
     return NULL;
 }

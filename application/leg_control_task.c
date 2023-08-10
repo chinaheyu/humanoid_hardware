@@ -27,6 +27,20 @@ void leg_control_task(void const* arg)
 {
     log_i("Leg control task start.");
     
+    struct app_manage *app = get_current_app();
+    if (app->app_id == 2)
+    {
+        // LEFT_LEG_CONTROL
+    }
+    if (app->app_id == 3)
+    {
+        // RIGHT_LEG_CONTROL
+    }
+    if (app->app_id == 4)
+    {
+        // WAIST_CONTROL
+    }
+    
     register_cmd_callback(CMD_MOTOR_MIT, motor_mit_control_callback);
     register_cmd_callback(CMD_MOTOR_POSITION, motor_position_control_callback);
     

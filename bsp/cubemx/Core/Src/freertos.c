@@ -167,11 +167,8 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_services_task */
 __weak void services_task(void const * argument)
 {
-
-
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
-
   /* USER CODE BEGIN services_task */
   /* Infinite loop */
   for(;;)
@@ -186,5 +183,3 @@ __weak void services_task(void const * argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

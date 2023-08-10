@@ -29,7 +29,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -65,8 +64,10 @@ void Error_Handler(void);
 #define DBUS_USART3_RX_GPIO_Port GPIOC
 #define USART6_RX_3P_Pin GPIO_PIN_9
 #define USART6_RX_3P_GPIO_Port GPIOG
-#define LASER_TIM3_CH3_Pin GPIO_PIN_8
-#define LASER_TIM3_CH3_GPIO_Port GPIOC
+#define IO8_Pin GPIO_PIN_0
+#define IO8_GPIO_Port GPIOF
+#define IO6_Pin GPIO_PIN_1
+#define IO6_GPIO_Port GPIOF
 #define RSTN_IST8310_Pin GPIO_PIN_6
 #define RSTN_IST8310_GPIO_Port GPIOG
 #define HEAT_TIM10_CH1_Pin GPIO_PIN_6
@@ -97,12 +98,12 @@ void Error_Handler(void);
 #define INT1_GYRO_Pin GPIO_PIN_5
 #define INT1_GYRO_GPIO_Port GPIOC
 #define INT1_GYRO_EXTI_IRQn EXTI9_5_IRQn
+#define PITCH_LIMIT1_Pin GPIO_PIN_12
+#define PITCH_LIMIT1_GPIO_Port GPIOB
+#define PITCH_LIMIT2_Pin GPIO_PIN_13
+#define PITCH_LIMIT2_GPIO_Port GPIOB
 #define CS1_GYRO_Pin GPIO_PIN_0
 #define CS1_GYRO_GPIO_Port GPIOB
-#define IO6_Pin GPIO_PIN_1
-#define IO6_GPIO_Port GPIOF
-#define IO8_Pin GPIO_PIN_0
-#define IO8_GPIO_Port GPIOF
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -112,5 +113,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

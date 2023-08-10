@@ -35,7 +35,9 @@ struct app_table
 static app_table[] = {
     {"TEST", test_task_init},
     {"HEAD_CONTROL", head_control_task_init},
-    {"LEG_CONTROL", leg_control_task_init}
+    {"LEFT_LEG_CONTROL", leg_control_task_init},
+    {"RIGHT_LEG_CONTROL", leg_control_task_init},
+    {"WAIST_CONTROL", leg_control_task_init},
 };
 
 struct app_manage *get_current_app(void)

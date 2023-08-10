@@ -16,11 +16,12 @@
 static struct dm_motor_device yaw_motor;
 static float pitch_motor_speed;
 
+
 void pitch_motor_set_speed(float speed)
 {
-    int ccr = speed * 999.0f;
-    if (ccr > 999)
-        ccr = 999;
+    int ccr = speed * (float)TIM1->ARR;
+    if (ccr > TIM1->ARR)
+        ccr = TIM1->ARR;
     if (ccr < 0)
         ccr = 0;
     TIM1->CCR1 = ccr;
@@ -108,6 +109,39 @@ int32_t head_state_feedback(void *argc)
     usb_interface_send(buffer, frame_size);
 }
 
+int32_t check_pitch_limit(void *argc)
+{
+    int pitch_forward_limit_state = HAL_GPIO_ReadPin(PITCH_LIMIT1_GPIO_Port, PITCH_LIMIT1_Pin) == GPIO_PIN_SET;
+    int pitch_backward_limit_state = HAL_GPIO_ReadPin(PITCH_LIMIT2_GPIO_Port, PITCH_LIMIT2_Pin) == GPIO_PIN_SET;
+    if (pitch_forward_limit_state || pitch_backward_limit_state)
+    {
+        beep_set_times(3);
+        if (pitch_motor_speed > 0)
+        {
+            if (pitch_forward_limit_state)
+            {
+                pitch_motor_stop();
+                pitch_motor_set_speed(0);
+                pitch_motor_speed = 0;
+            }
+        }
+        if (pitch_motor_speed < 0)
+        {
+            if (pitch_backward_limit_state)
+            {
+                pitch_motor_stop();
+                pitch_motor_set_speed(0);
+                pitch_motor_speed = 0;
+            }
+        }
+    }
+    else
+    {
+        beep_set_times(0);
+    }
+    return 0;
+}
+
 void head_control_task_init(void)
 {
     log_i("Head control task start.");
@@ -128,4 +162,5 @@ void head_control_task_init(void)
     register_cmd_callback(CMD_NECK_MOTOR, cmd_neck_motor_callback);
     
     soft_timer_register(head_state_feedback, NULL, 10);
+    soft_timer_register(check_pitch_limit, NULL, 1);
 }

@@ -439,11 +439,6 @@
               <FilePath>..\bsp\boards\board.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\bsp\boards\stm32f4xx_it.c</FilePath>
-            </File>
-            <File>
               <FileName>drv_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\boards\drv_can.c</FilePath>
@@ -862,6 +857,11 @@
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\cubemx\Core\Src\rng.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\cubemx\Core\Src\stm32f4xx_it.c</FilePath>
             </File>
           </Files>
         </Group>

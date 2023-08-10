@@ -108,5 +108,9 @@ void services_task(void const *argument)
 void hw_init(void)
 {
     board_config();
+    
+    // Clear flash error flag
+    __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+    
     easyflash_init();
 }

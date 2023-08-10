@@ -5,6 +5,7 @@
 #include "event_mgr.h"
 #include "event.h"
 #include "os_timer.h"
+#include "app_manage.h"
 
 #define LOG_TAG "communication"
 #define LOG_OUTPUT_LEVEL 4
@@ -75,6 +76,18 @@ PROTOCOL_CALLBACK_FUNCTION(reset_device)
     HAL_NVIC_SystemReset();
 }
 
+PROTOCOL_CALLBACK_FUNCTION(read_app_ip)
+{
+    struct app_manage *app = get_current_app();
+    cmd_read_app_id_feedback_t msg;
+    msg.timestamp = get_timestamp();
+    msg.app_id = app->app_id;
+    size_t frame_size = protocol_calculate_frame_size(sizeof(cmd_read_app_id_feedback_t));
+    uint8_t* buffer = (uint8_t*)alloca(frame_size);
+    protocol_pack_data_to_buffer(CMD_READ_APP_ID_FEEDBACK, (uint8_t*)&msg, sizeof(cmd_read_app_id_feedback_t), buffer);
+    usb_interface_send(buffer, frame_size);
+}
+
 int32_t unpack_bytes(uint8_t *buf, uint32_t len)
 {
     for(int i = 0; i < len; ++i)
@@ -93,6 +106,7 @@ void communication_task_init(void)
 {
     register_cmd_callback(CMD_SYNC, sync_machine_time);
     register_cmd_callback(CMD_RESET, reset_device);
+    register_cmd_callback(CMD_READ_APP_ID, read_app_ip);
     protocol_static_create_unpack_stream(&unpack_stream_object, heap_malloc(PROTOCOL_MAX_FRAME_LENGTH), PROTOCOL_MAX_FRAME_LENGTH);
     usb_vcp_rx_callback_register(unpack_bytes);
 }
