@@ -46,13 +46,22 @@ uint8_t get_appid_from_flash()
     return 0;
 }
 
-void task_init(void)
+void play_startup_sound_dji()
 {
-    communication_task_init();
-    uint8_t appid = get_appid_from_flash();
-    app_task_init(appid);
-    
-    // Initializa finished.
+    float volumn = 0.3;
+    TIM4->PSC = 20;
+    beep_set_tune(10255, 10255 * volumn);
+    osDelay(175);
+    beep_set_tune(9090, 9090 * volumn);
+    osDelay(300);
+    beep_set_tune(6106, 6106 * volumn);
+    osDelay(300);
+    beep_set_tune(0, 0);
+    TIM4->PSC = 83;
+}
+
+void play_startup_sound()
+{
     beep_set_tune(500, 150);
     osDelay(150);
     beep_set_tune(400, 100);
@@ -60,6 +69,16 @@ void task_init(void)
     beep_set_tune(300, 50);
     osDelay(150);
     beep_set_tune(0, 0);
+}
+
+void task_init(void)
+{
+    communication_task_init();
+    uint8_t appid = get_appid_from_flash();
+    app_task_init(appid);
+    
+    // Initializa finished.
+    play_startup_sound_dji();
 }
 
 void sys_task(void)

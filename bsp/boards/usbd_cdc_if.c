@@ -137,7 +137,7 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t *pbuf, uint16_t length);
 static int8_t CDC_Receive_FS(uint8_t *pbuf, uint32_t *Len);
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-
+static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum);
 /* USER CODE END PRIVATE_FUNCTIONS_DECLARATION */
 
 /**
@@ -149,7 +149,8 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
     CDC_Init_FS,
     CDC_DeInit_FS,
     CDC_Control_FS,
-    CDC_Receive_FS
+    CDC_Receive_FS,
+    CDC_TransmitCplt_FS
 };
 
 /* Private functions ---------------------------------------------------------*/
@@ -325,6 +326,12 @@ uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
+{
+    if (epnum == CDC_IN_EP)
+        usb_tx_flush(NULL);
+}
 
 int32_t usb_tx_flush(void *argc)
 {
