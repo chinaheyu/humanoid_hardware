@@ -30,6 +30,10 @@ struct zeroerr_motor_device
     uint32_t encoder_count;         // 编码器单圈值
     enum zeroerr_mode_type mode;    // 工作模式
     struct zeroerr_motor_data data; // 反馈数据
+    
+    uint8_t initialized;            // 初始化
+    uint8_t moving;                 // 正在运动
+    float target_position;          // 目标位置
 };
 
 typedef struct zeroerr_motor_device* zeroerr_motor_device_t;

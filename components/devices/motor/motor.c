@@ -55,7 +55,10 @@ void motor_position_control(uint8_t id, float position)
                 }
                 if (((motor_device_t)object)->type == MOTOR_ZEROERR)
                 {
-                    zeroerr_motor_absolute_position((zeroerr_motor_device_t)object, position);
+                    if (((zeroerr_motor_device_t)object)->initialized)
+                    {
+                        ((zeroerr_motor_device_t)object)->target_position = position;
+                    }
                 }
                 break;
             }

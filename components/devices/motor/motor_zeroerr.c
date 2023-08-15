@@ -208,6 +208,8 @@ int32_t zeroerr_motor_update_once(void* zeroerr_motor)
     // 读取位置
     uint8_t data[4] = { 0x00, 0x02, 0x00, 0x01 };
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    osSemaphoreRelease(zeroerr_semaphore_id);
     if (motor->data.feedback_frame_counter != 3)
     {
         motor->data.feedback_frame_counter = 0;
@@ -217,6 +219,8 @@ int32_t zeroerr_motor_update_once(void* zeroerr_motor)
     // 读取速度
     data[1] = 0x05;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 4);
+    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    osSemaphoreRelease(zeroerr_semaphore_id);
     if (motor->data.feedback_frame_counter != 2)
     {
         motor->data.feedback_frame_counter = 0;
@@ -226,6 +230,8 @@ int32_t zeroerr_motor_update_once(void* zeroerr_motor)
     // 读取电流
     data[1] = 0x08;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    osSemaphoreRelease(zeroerr_semaphore_id);
     if (motor->data.feedback_frame_counter != 1)
     {
         motor->data.feedback_frame_counter = 0;
@@ -236,6 +242,8 @@ int32_t zeroerr_motor_update_once(void* zeroerr_motor)
     data[0] = 0x02;
     data[1] = 0x0D;
     zeroerr_can_std_transmit(zeroerr_can, 0x640 + motor->can_id, data, 2);
+    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    osSemaphoreRelease(zeroerr_semaphore_id);
     if (motor->data.feedback_frame_counter != 0)
     {
         motor->data.feedback_frame_counter = 0;
@@ -292,6 +300,11 @@ int32_t zeroerr_feedback_callback(CAN_RxHeaderTypeDef *header, uint8_t *data)
                 // 位置
                 motor_dev->data.position_int = bigEndianToLittleEndian(*(int*)data);
                 motor_dev->parent.data.position = encoder_to_rad(motor_dev, motor_dev->data.position_int);
+                if (!motor_dev->initialized)
+                {
+                    motor_dev->target_position = motor_dev->parent.data.position;
+                    motor_dev->initialized = 1;
+                }
                 break;
             case 3:
                 // 速度
@@ -317,8 +330,9 @@ int32_t zeroerr_feedback_callback(CAN_RxHeaderTypeDef *header, uint8_t *data)
 
 uint32_t zeroerr_can_std_transmit(can_manage_obj_t m_obj, uint16_t std_id, uint8_t *data, uint16_t len)
 {
-    osSemaphoreWait(zeroerr_semaphore_id, 1);
-    can_std_transmit(m_obj, std_id, data, len);
+    osSemaphoreWait(zeroerr_semaphore_id, 100);
+    if (osSemaphoreGetCount(zeroerr_semaphore_id) == 0)
+        can_std_transmit(m_obj, std_id, data, len);
     return 0;
 }
 
