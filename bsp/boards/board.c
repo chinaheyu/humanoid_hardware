@@ -28,8 +28,8 @@
 
 #include "log.h"
 
-static long long timestamp_sync;
-static long long machine_time_sync;
+volatile long long timestamp_sync;
+volatile long long machine_time_sync;
 
 static struct app_manage *board_app;
 
@@ -138,6 +138,6 @@ float get_machine_time_ms_us(void)
 
 long long get_timestamp(void)
 {
-    long long microseconds = 1000.0 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync + timestamp_sync;
+    long long microseconds = 1000 * get_machine_time_ms() + get_machine_time_us() - machine_time_sync + timestamp_sync;
     return microseconds;
 }
