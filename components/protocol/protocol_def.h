@@ -18,6 +18,8 @@ typedef struct
 
 #define CMD_READ_APP_ID (0x0003)
 
+#define CMD_INITIALIZE_MOTOR (0x0004)
+
 #define CMD_GYRO_FEEDBACK (0x0101)
 typedef struct 
 {

@@ -13,12 +13,22 @@ enum zeroerr_mode_type
     ZEROERR_MODE_FORCE
 };
 
+enum zeroerr_return_type_e
+{
+    ZEROERR_RETURN_WRITE_FINISNED,
+    ZEROERR_RETURN_READ_STATE,
+    ZEROERR_RETURN_READ_POSITION,
+    ZEROERR_RETURN_READ_VELOCITY,
+    ZEROERR_RETURN_READ_TORQUE,
+};
+
 struct zeroerr_motor_data
 {
-    int feedback_frame_counter;
+    enum zeroerr_return_type_e return_type;
+    int success;
+    int state;      // 0：停止运动 1：运动中 3：重复停止中
     int position_int;
     int velocity_int;
-    int current_int;
     int torque_int;
 };
 
@@ -26,13 +36,12 @@ struct zeroerr_motor_device
 {
     struct motor_device parent;     // inherit motor_device
     uint16_t can_id;                // can id
-    uint32_t update_period;         // 电机反馈更新周期，单位毫秒
     uint32_t encoder_count;         // 编码器单圈值
     enum zeroerr_mode_type mode;    // 工作模式
     struct zeroerr_motor_data data; // 反馈数据
     
     uint8_t initialized;            // 初始化
-    uint8_t moving;                 // 正在运动
+    float position_offset;
     float target_position;          // 目标位置
 };
 
@@ -42,7 +51,7 @@ typedef struct zeroerr_motor_device* zeroerr_motor_device_t;
 void zeroerr_init(can_manage_obj_t can);
 
 // 初始化电机对象
-void zeroerr_motor_init(zeroerr_motor_device_t zeroerr_motor, uint16_t can_id, enum zeroerr_mode_type mode, uint32_t update_period, uint32_t encoder_count);
+void zeroerr_motor_init(zeroerr_motor_device_t zeroerr_motor, uint16_t can_id, uint32_t encoder_count);
 
 // 设置电机工作模式
 void zeroerr_motor_set_mode(zeroerr_motor_device_t zeroerr_motor, enum zeroerr_mode_type mode);
@@ -77,8 +86,13 @@ void zeroerr_motor_absolute_position(zeroerr_motor_device_t zeroerr_motor, float
 // 设置电机模拟量（速度模式rad/s，力矩模式mA）
 void zeroerr_motor_analog_value(zeroerr_motor_device_t zeroerr_motor, float analog_value);
 
-// 更新一次电机状态（位置，速度，力矩）
-int32_t zeroerr_motor_update_once(void* zeroerr_motor);
+void zeroerr_motor_read_position(zeroerr_motor_device_t zeroerr_motor);
+
+void zeroerr_motor_read_velocity(zeroerr_motor_device_t zeroerr_motor);
+
+void zeroerr_motor_read_torque(zeroerr_motor_device_t zeroerr_motor);
+
+void zeroerr_motor_read_state(zeroerr_motor_device_t zeroerr_motor);
 
 // 查找电机对象
 zeroerr_motor_device_t zeroerr_motor_find_by_canid(uint16_t can_id);

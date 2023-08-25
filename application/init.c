@@ -23,6 +23,7 @@
 #include "easyflash.h"
 #include "shell.h"
 #include "drv_io.h"
+#include "iwdg.h"
 
 #include "sensor_task.h"
 #include "communication_task.h"
@@ -117,8 +118,10 @@ void services_task(void const *argument)
     log_printf("\r\n>>> ");
     /* USER CODE BEGIN services_task */
     /* Infinite loop */
+    MX_IWDG_Init();
     for (;;)
     {
+        HAL_IWDG_Refresh(&hiwdg);
         osDelay(100);
     }
     /* USER CODE END services_task */

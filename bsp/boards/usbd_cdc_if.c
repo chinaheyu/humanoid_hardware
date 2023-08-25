@@ -192,6 +192,7 @@ static int8_t CDC_DeInit_FS(void)
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t *pbuf, uint16_t length)
 {
     /* USER CODE BEGIN 5 */
+    // bmRequestType = USB_REQ_TYPE_CLASS
     switch (cmd)
     {
     case CDC_SEND_ENCAPSULATED_COMMAND:
@@ -329,7 +330,7 @@ uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len)
 
 int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 {
-    if (epnum == CDC_IN_EP)
+    if (epnum == CDC_OUT_EP)
         usb_tx_flush(NULL);
 }
 

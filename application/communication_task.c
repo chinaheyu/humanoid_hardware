@@ -76,7 +76,7 @@ PROTOCOL_CALLBACK_FUNCTION(reset_device)
     HAL_NVIC_SystemReset();
 }
 
-PROTOCOL_CALLBACK_FUNCTION(read_app_ip)
+PROTOCOL_CALLBACK_FUNCTION(read_app_id)
 {
     struct app_manage *app = get_current_app();
     cmd_read_app_id_feedback_t msg;
@@ -106,7 +106,7 @@ void communication_task_init(void)
 {
     register_cmd_callback(CMD_SYNC, sync_machine_time);
     register_cmd_callback(CMD_RESET, reset_device);
-    register_cmd_callback(CMD_READ_APP_ID, read_app_ip);
+    register_cmd_callback(CMD_READ_APP_ID, read_app_id);
     protocol_static_create_unpack_stream(&unpack_stream_object, heap_malloc(PROTOCOL_MAX_FRAME_LENGTH), PROTOCOL_MAX_FRAME_LENGTH);
     usb_vcp_rx_callback_register(unpack_bytes);
 }

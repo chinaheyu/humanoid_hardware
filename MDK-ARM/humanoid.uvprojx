@@ -863,6 +863,11 @@
               <FileType>1</FileType>
               <FilePath>..\bsp\cubemx\Core\Src\stm32f4xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\cubemx\Core\Src\iwdg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1032,6 +1037,11 @@
               <FileName>stm32f4xx_hal_rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\cubemx\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rng.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\cubemx\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_iwdg.c</FilePath>
             </File>
           </Files>
         </Group>
